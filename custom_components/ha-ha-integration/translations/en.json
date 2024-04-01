@@ -1,0 +1,18 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "description": "Please enter the data for your remote Home Assistant instance",
+                "data": {
+                    "url": "URL",
+                    "api_key": "API Key"
+                }
+            }
+        },
+        "error": {
+            "auth": "API Key is wrong.",
+            "connection": "URL is wrong.",
+            "unknown": "Unknown error occurred."
+        }
+    }
+}
