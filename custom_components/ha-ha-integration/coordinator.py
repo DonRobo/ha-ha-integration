@@ -12,15 +12,15 @@ from homeassistant.helpers.update_coordinator import (
 from homeassistant.exceptions import ConfigEntryAuthFailed
 
 from .api import (
-    IntegrationBlueprintApiClient,
-    IntegrationBlueprintApiClientAuthenticationError,
-    IntegrationBlueprintApiClientError,
+    HaiApiClient,
+    HaiApiClientAuthenticationError,
+    HaiApiClientError,
 )
 from .const import DOMAIN, LOGGER
 
 
 # https://developers.home-assistant.io/docs/integration_fetching_data#coordinated-single-api-poll-for-data-for-all-entities
-class BlueprintDataUpdateCoordinator(DataUpdateCoordinator):
+class HaiDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
 
     config_entry: ConfigEntry
@@ -28,7 +28,7 @@ class BlueprintDataUpdateCoordinator(DataUpdateCoordinator):
     def __init__(
         self,
         hass: HomeAssistant,
-        client: IntegrationBlueprintApiClient,
+        client: HaiApiClient,
     ) -> None:
         """Initialize."""
         self.client = client
@@ -42,8 +42,9 @@ class BlueprintDataUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self):
         """Update data via library."""
         try:
-            return await self.client.async_get_data()
-        except IntegrationBlueprintApiClientAuthenticationError as exception:
+            LOGGER.debug("Fetching data from API")
+            return await self.client.async_get_state('sensor.gw1100a_solar_radiation')
+        except HaiApiClientAuthenticationError as exception:
             raise ConfigEntryAuthFailed(exception) from exception
-        except IntegrationBlueprintApiClientError as exception:
+        except HaiApiClientError as exception:
             raise UpdateFailed(exception) from exception

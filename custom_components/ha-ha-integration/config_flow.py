@@ -8,10 +8,10 @@ from homeassistant.helpers import selector
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
 from .api import (
-    IntegrationBlueprintApiClient,
-    IntegrationBlueprintApiClientAuthenticationError,
-    IntegrationBlueprintApiClientCommunicationError,
-    IntegrationBlueprintApiClientError,
+    HaiApiClient,
+    HaiApiClientAuthenticationError,
+    HaiApiClientCommunicationError,
+    HaiApiClientError,
 )
 from .const import DOMAIN, LOGGER
 
@@ -30,21 +30,22 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             try:
                 await self._test_credentials(
-                    username=user_input[CONF_USERNAME],
-                    password=user_input[CONF_PASSWORD],
+                    url=user_input["url"],
+                    auth_token=user_input["auth_token"],
+                    ssl=user_input["ssl"].lower() == "true",
                 )
-            except IntegrationBlueprintApiClientAuthenticationError as exception:
+            except HaiApiClientAuthenticationError as exception:
                 LOGGER.warning(exception)
                 _errors["base"] = "auth"
-            except IntegrationBlueprintApiClientCommunicationError as exception:
+            except HaiApiClientCommunicationError as exception:
                 LOGGER.error(exception)
                 _errors["base"] = "connection"
-            except IntegrationBlueprintApiClientError as exception:
+            except HaiApiClientError as exception:
                 LOGGER.exception(exception)
                 _errors["base"] = "unknown"
             else:
                 return self.async_create_entry(
-                    title=user_input[CONF_USERNAME],
+                    title=user_input["url"],
                     data=user_input,
                 )
 
@@ -52,17 +53,19 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=vol.Schema(
                 {
-                    vol.Required(
-                        CONF_USERNAME,
-                        default=(user_input or {}).get(CONF_USERNAME),
-                    ): selector.TextSelector(
+                    vol.Required("url"): selector.TextSelector(
                         selector.TextSelectorConfig(
                             type=selector.TextSelectorType.TEXT
                         ),
                     ),
-                    vol.Required(CONF_PASSWORD): selector.TextSelector(
+                    vol.Required("auth_token"): selector.TextSelector(
                         selector.TextSelectorConfig(
-                            type=selector.TextSelectorType.PASSWORD
+                            type=selector.TextSelectorType.TEXT
+                        ),
+                    ),
+                    vol.Required("ssl"): selector.TextSelector(
+                        selector.TextSelectorConfig(
+                            type=selector.TextSelectorType.TEXT
                         ),
                     ),
                 }
@@ -70,11 +73,12 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             errors=_errors,
         )
 
-    async def _test_credentials(self, username: str, password: str) -> None:
+    async def _test_credentials(self, url: str, auth_token: str, ssl:bool) -> None:
         """Validate credentials."""
-        client = IntegrationBlueprintApiClient(
-            username=username,
-            password=password,
+        client = HaiApiClient(
+            url=url,
+            auth_token=auth_token,
+            ssl=ssl,
             session=async_create_clientsession(self.hass),
         )
-        await client.async_get_data()
+        await client.async_get_state('sensor.gw1100a_solar_radiation')

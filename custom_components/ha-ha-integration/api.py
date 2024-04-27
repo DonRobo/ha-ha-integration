@@ -1,4 +1,3 @@
-"""Sample API Client."""
 from __future__ import annotations
 
 import asyncio
@@ -7,84 +6,74 @@ import socket
 import aiohttp
 import async_timeout
 
+from homeassistant.core import State
 
-class IntegrationBlueprintApiClientError(Exception):
+from .const import LOGGER
+
+class HaiApiClientError(Exception):
     """Exception to indicate a general API error."""
 
 
-class IntegrationBlueprintApiClientCommunicationError(
-    IntegrationBlueprintApiClientError
+class HaiApiClientCommunicationError(
+    HaiApiClientError
 ):
     """Exception to indicate a communication error."""
 
 
-class IntegrationBlueprintApiClientAuthenticationError(
-    IntegrationBlueprintApiClientError
+class HaiApiClientAuthenticationError(
+    HaiApiClientError
 ):
     """Exception to indicate an authentication error."""
 
-
-class IntegrationBlueprintApiClient:
+class HaiApiClient:
     """Sample API Client."""
 
     def __init__(
         self,
-        username: str,
-        password: str,
+        url: str,
+        auth_token: str,
+        ssl:bool,
         session: aiohttp.ClientSession,
     ) -> None:
         """Sample API Client."""
-        self._username = username
-        self._password = password
+        self._url = url
+        self._auth_token = auth_token
         self._session = session
+        self._ssl = ssl
 
-    async def async_get_data(self) -> any:
-        """Get data from the API."""
-        return await self._api_wrapper(
-            method="get", url="https://jsonplaceholder.typicode.com/posts/1"
-        )
-
-    async def async_set_title(self, value: str) -> any:
-        """Get data from the API."""
-        return await self._api_wrapper(
-            method="patch",
-            url="https://jsonplaceholder.typicode.com/posts/1",
-            data={"title": value},
-            headers={"Content-type": "application/json; charset=UTF-8"},
-        )
-
-    async def _api_wrapper(
-        self,
-        method: str,
-        url: str,
-        data: dict | None = None,
-        headers: dict | None = None,
-    ) -> any:
+    async def async_get_state(self, entity_id) -> str | None:
         """Get information from the API."""
         try:
             async with async_timeout.timeout(10):
+                protocol = "https" if self._ssl else "http"
                 response = await self._session.request(
-                    method=method,
-                    url=url,
-                    headers=headers,
-                    json=data,
+                    method = "get",
+                    url = f"{protocol}://{self._url}/api/states/{entity_id}",
+                    headers = {
+                        "Authorization": f"Bearer {self._auth_token}",
+                        "Content-Type": "application/json",
+                    }
                 )
+
                 if response.status in (401, 403):
-                    raise IntegrationBlueprintApiClientAuthenticationError(
+                    raise HaiApiClientAuthenticationError(
                         "Invalid credentials",
                     )
                 response.raise_for_status()
-                return await response.json()
+                json = await response.json()
+
+                return json
 
         except asyncio.TimeoutError as exception:
-            raise IntegrationBlueprintApiClientCommunicationError(
+            raise HaiApiClientCommunicationError(
                 "Timeout error fetching information",
             ) from exception
         except (aiohttp.ClientError, socket.gaierror) as exception:
-            raise IntegrationBlueprintApiClientCommunicationError(
+            raise HaiApiClientCommunicationError(
                 "Error fetching information",
             ) from exception
         except Exception as exception:  # pylint: disable=broad-except
-            raise IntegrationBlueprintApiClientError(
+            raise HaiApiClientError(
                 "Something really wrong happened!"
             ) from exception
+

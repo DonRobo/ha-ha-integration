@@ -5,7 +5,8 @@
                 "description": "Please enter the data for your remote Home Assistant instance",
                 "data": {
                     "url": "URL",
-                    "api_key": "API Key"
+                    "auth_token": "Auth token",
+                    "ssl": "Enable SSL"
                 }
             }
         },

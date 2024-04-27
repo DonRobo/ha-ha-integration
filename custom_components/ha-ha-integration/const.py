@@ -5,5 +5,4 @@ LOGGER: Logger = getLogger(__package__)
 
 NAME = "Integration blueprint"
 DOMAIN = "ha-ha-integration"
-VERSION = "0.0.0"
-ATTRIBUTION = "Data provided by http://jsonplaceholder.typicode.com/"
+VERSION = "0.0.1"

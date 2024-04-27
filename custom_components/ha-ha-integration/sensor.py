@@ -4,7 +4,7 @@ from __future__ import annotations
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
 
 from .const import DOMAIN
-from .coordinator import BlueprintDataUpdateCoordinator
+from .coordinator import HaiDataUpdateCoordinator
 from .entity import IntegrationBlueprintEntity
 
 ENTITY_DESCRIPTIONS = (
@@ -33,7 +33,7 @@ class IntegrationBlueprintSensor(IntegrationBlueprintEntity, SensorEntity):
 
     def __init__(
         self,
-        coordinator: BlueprintDataUpdateCoordinator,
+        coordinator: HaiDataUpdateCoordinator,
         entity_description: SensorEntityDescription,
     ) -> None:
         """Initialize the sensor class."""
@@ -41,6 +41,21 @@ class IntegrationBlueprintSensor(IntegrationBlueprintEntity, SensorEntity):
         self.entity_description = entity_description
 
     @property
+    def state_class(self) -> str:
+        """Return the state class of the sensor."""
+        return self.coordinator.data["attributes"]["state_class"]
+
+    @property
+    def device_class(self) -> str:
+        """Return the device class of the sensor."""
+        return self.coordinator.data["attributes"]["device_class"]
+
+    @property
+    def native_unit_of_measurement(self) -> str:
+        """Return the unit of measurement of the sensor."""
+        return self.coordinator.data["attributes"]["unit_of_measurement"]
+
+    @property
     def native_value(self) -> str:
         """Return the native value of the sensor."""
-        return self.coordinator.data.get("body")
+        return self.coordinator.data["state"]

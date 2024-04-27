@@ -10,14 +10,12 @@ from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .api import IntegrationBlueprintApiClient
+from .api import HaiApiClient
 from .const import DOMAIN
-from .coordinator import BlueprintDataUpdateCoordinator
+from .coordinator import HaiDataUpdateCoordinator
 
 PLATFORMS: list[Platform] = [
     Platform.SENSOR,
-    Platform.BINARY_SENSOR,
-    Platform.SWITCH,
 ]
 
 
@@ -25,11 +23,12 @@ PLATFORMS: list[Platform] = [
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up this integration using UI."""
     hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = coordinator = BlueprintDataUpdateCoordinator(
+    hass.data[DOMAIN][entry.entry_id] = coordinator = HaiDataUpdateCoordinator(
         hass=hass,
-        client=IntegrationBlueprintApiClient(
-            username=entry.data[CONF_USERNAME],
-            password=entry.data[CONF_PASSWORD],
+        client=HaiApiClient(
+            url=entry.data["url"],
+            auth_token=entry.data["auth_token"],
+            ssl=entry.data["ssl"].lower() == "true",
             session=async_get_clientsession(hass),
         ),
     )
