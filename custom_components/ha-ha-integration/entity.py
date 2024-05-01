@@ -8,16 +8,17 @@ from .const import DOMAIN, NAME, VERSION
 from .coordinator import HaiDataUpdateCoordinator
 
 
-class IntegrationBlueprintEntity(CoordinatorEntity):
+class HaiEntity(CoordinatorEntity):
     """BlueprintEntity class."""
 
-    def __init__(self, coordinator: HaiDataUpdateCoordinator) -> None:
+    def __init__(self, coordinator: HaiDataUpdateCoordinator, context: str) -> None:
         """Initialize."""
-        super().__init__(coordinator)
+        super().__init__(coordinator, context=context)
+
         self._attr_unique_id = coordinator.config_entry.entry_id
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, self.unique_id)},
-            name=NAME,
+            identifiers={(DOMAIN, coordinator.config_entry.entry_id)},
+            name="Remote Home Assistant",
             model=VERSION,
-            manufacturer=NAME,
+            manufacturer="Home Assistant",
         )

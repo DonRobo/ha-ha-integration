@@ -43,7 +43,7 @@ class HaiDataUpdateCoordinator(DataUpdateCoordinator):
         """Update data via library."""
         try:
             LOGGER.debug("Fetching data from API")
-            return await self.client.async_get_state('sensor.gw1100a_solar_radiation')
+            return await self.client.async_get_all_states()
         except HaiApiClientAuthenticationError as exception:
             raise ConfigEntryAuthFailed(exception) from exception
         except HaiApiClientError as exception:

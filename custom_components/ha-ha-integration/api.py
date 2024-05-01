@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import socket
+from typing import Any
 
 import aiohttp
 import async_timeout
@@ -41,8 +42,8 @@ class HaiApiClient:
         self._session = session
         self._ssl = ssl
 
-    async def async_get_state(self, entity_id) -> str | None:
-        """Get information from the API."""
+    async def async_get_state(self, entity_id) -> Any | None:
+        """Get state for specified entity."""
         try:
             async with async_timeout.timeout(10):
                 protocol = "https" if self._ssl else "http"
@@ -77,3 +78,38 @@ class HaiApiClient:
                 "Something really wrong happened!"
             ) from exception
 
+    async def async_get_all_states(self) -> Any | None:
+        """Get all states from target Home Assistant."""
+        try:
+            async with async_timeout.timeout(10):
+                protocol = "https" if self._ssl else "http"
+                response = await self._session.request(
+                    method = "get",
+                    url = f"{protocol}://{self._url}/api/states",
+                    headers = {
+                        "Authorization": f"Bearer {self._auth_token}",
+                        "Content-Type": "application/json",
+                    }
+                )
+
+                if response.status in (401, 403):
+                    raise HaiApiClientAuthenticationError(
+                        "Invalid credentials",
+                    )
+                response.raise_for_status()
+                json = await response.json()
+
+                return json
+
+        except asyncio.TimeoutError as exception:
+            raise HaiApiClientCommunicationError(
+                "Timeout error fetching information",
+            ) from exception
+        except (aiohttp.ClientError, socket.gaierror) as exception:
+            raise HaiApiClientCommunicationError(
+                "Error fetching information",
+            ) from exception
+        except Exception as exception:  # pylint: disable=broad-except
+            raise HaiApiClientError(
+                "Something really wrong happened!"
+            ) from exception

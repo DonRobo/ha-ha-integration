@@ -81,4 +81,4 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             ssl=ssl,
             session=async_create_clientsession(self.hass),
         )
-        await client.async_get_state('sensor.gw1100a_solar_radiation')
+        await client.async_get_all_states()
