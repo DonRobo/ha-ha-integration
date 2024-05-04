@@ -32,7 +32,7 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 await self._test_credentials(
                     url=user_input["url"],
                     auth_token=user_input["auth_token"],
-                    ssl=user_input["ssl"].lower() == "true",
+                    ssl=user_input["ssl"],
                 )
             except HaiApiClientAuthenticationError as exception:
                 LOGGER.warning(exception)
@@ -45,7 +45,7 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 _errors["base"] = "unknown"
             else:
                 return self.async_create_entry(
-                    title=user_input["url"],
+                    title=user_input["name"],
                     data=user_input,
                 )
 
@@ -53,21 +53,10 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=vol.Schema(
                 {
-                    vol.Required("url"): selector.TextSelector(
-                        selector.TextSelectorConfig(
-                            type=selector.TextSelectorType.TEXT
-                        ),
-                    ),
-                    vol.Required("auth_token"): selector.TextSelector(
-                        selector.TextSelectorConfig(
-                            type=selector.TextSelectorType.TEXT
-                        ),
-                    ),
-                    vol.Required("ssl"): selector.TextSelector(
-                        selector.TextSelectorConfig(
-                            type=selector.TextSelectorType.TEXT
-                        ),
-                    ),
+                    vol.Required("name"): str,
+                    vol.Required("url"): str,
+                    vol.Required("auth_token"): str,
+                    vol.Required("ssl", default=True): bool,
                 }
             ),
             errors=_errors,

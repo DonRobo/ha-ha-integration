@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
 
-from .const import DOMAIN
+from .const import DOMAIN, LOGGER
 from .coordinator import HaiDataUpdateCoordinator
 from .entity import HaiEntity
 from typing import Any
@@ -32,10 +32,11 @@ class HaiSensor(HaiEntity, SensorEntity):
         super().__init__(coordinator, context=remote_id)
         self._remote_id = remote_id
         self._remote_id_name_part = remote_id.replace("sensor.", "")
-        self.entity_description=SensorEntityDescription( # TODO check that this is correct
-            key="remote_"+self._remote_id_name_part,
-            name="remote_"+self._remote_id_name_part,
-        )
+        self._attr_unique_id = coordinator.config_entry.entry_id+ "_" + remote_id
+        self._attr_has_entity_name = True
+        self._attr_name = self._remote_id_name_part.replace("_", " ").title()
+        self._attr_entity_registry_enabled_default = False
+
 
     def _get_remote_entity(self) -> Any | None:
         """Get remote entity."""
@@ -76,7 +77,7 @@ class HaiSensor(HaiEntity, SensorEntity):
         if remote_entity is None or "state" not in remote_entity:
             return None
         state= self._get_remote_entity()["state"]
-        if state=="unknown":
+        if state == "unknown" or state == "unavailable":
             return None
         else:
             return state
@@ -84,4 +85,9 @@ class HaiSensor(HaiEntity, SensorEntity):
     @property
     def unique_id(self)->str:
         """Return a unique ID."""
+        return self._remote_id_name_part
+
+    @property
+    def name(self) -> str:
+        """Return the name of the sensor."""
         return self._remote_id_name_part

@@ -29,13 +29,14 @@ class HaiDataUpdateCoordinator(DataUpdateCoordinator):
         self,
         hass: HomeAssistant,
         client: HaiApiClient,
+        name: str,
     ) -> None:
         """Initialize."""
         self.client = client
         super().__init__(
             hass=hass,
             logger=LOGGER,
-            name=DOMAIN,
+            name=name,
             update_interval=timedelta(minutes=5),
         )
 

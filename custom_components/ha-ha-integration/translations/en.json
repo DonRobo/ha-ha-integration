@@ -4,6 +4,7 @@
             "user": {
                 "description": "Please enter the data for your remote Home Assistant instance",
                 "data": {
+                    "name": "Instance name",
                     "url": "URL",
                     "auth_token": "Auth token",
                     "ssl": "Enable SSL"

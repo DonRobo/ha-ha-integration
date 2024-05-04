@@ -25,10 +25,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = coordinator = HaiDataUpdateCoordinator(
         hass=hass,
+        name=entry.data["name"],
         client=HaiApiClient(
             url=entry.data["url"],
             auth_token=entry.data["auth_token"],
-            ssl=entry.data["ssl"].lower() == "true",
+            ssl=entry.data["ssl"],
             session=async_get_clientsession(hass),
         ),
     )
