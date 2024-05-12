@@ -10,7 +10,7 @@ from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .api import HaiApiClient
+from .api import HaiRestApiClient
 from .const import DOMAIN
 from .coordinator import HaiDataUpdateCoordinator
 
@@ -26,7 +26,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data[DOMAIN][entry.entry_id] = coordinator = HaiDataUpdateCoordinator(
         hass=hass,
         name=entry.data["name"],
-        client=HaiApiClient(
+        client=HaiRestApiClient(
             url=entry.data["url"],
             auth_token=entry.data["auth_token"],
             ssl=entry.data["ssl"],

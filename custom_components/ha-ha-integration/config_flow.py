@@ -8,7 +8,7 @@ from homeassistant.helpers import selector
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
 from .api import (
-    HaiApiClient,
+    HaiRestApiClient,
     HaiApiClientAuthenticationError,
     HaiApiClientCommunicationError,
     HaiApiClientError,
@@ -64,7 +64,7 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def _test_credentials(self, url: str, auth_token: str, ssl:bool) -> None:
         """Validate credentials."""
-        client = HaiApiClient(
+        client = HaiRestApiClient(
             url=url,
             auth_token=auth_token,
             ssl=ssl,

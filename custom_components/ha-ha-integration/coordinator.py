@@ -12,7 +12,7 @@ from homeassistant.helpers.update_coordinator import (
 from homeassistant.exceptions import ConfigEntryAuthFailed
 
 from .api import (
-    HaiApiClient,
+    HaiRestApiClient,
     HaiApiClientAuthenticationError,
     HaiApiClientError,
 )
@@ -28,7 +28,7 @@ class HaiDataUpdateCoordinator(DataUpdateCoordinator):
     def __init__(
         self,
         hass: HomeAssistant,
-        client: HaiApiClient,
+        client: HaiRestApiClient,
         name: str,
     ) -> None:
         """Initialize."""

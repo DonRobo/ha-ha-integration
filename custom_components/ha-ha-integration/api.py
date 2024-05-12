@@ -26,8 +26,8 @@ class HaiApiClientAuthenticationError(
 ):
     """Exception to indicate an authentication error."""
 
-class HaiApiClient:
-    """Sample API Client."""
+class HaiRestApiClient:
+    """Connect to Home Assistant through REST API."""
 
     def __init__(
         self,
@@ -36,7 +36,7 @@ class HaiApiClient:
         ssl:bool,
         session: aiohttp.ClientSession,
     ) -> None:
-        """Sample API Client."""
+        """Initialize the API client."""
         self._url = url
         self._auth_token = auth_token
         self._session = session
@@ -79,7 +79,7 @@ class HaiApiClient:
             ) from exception
 
     async def async_get_all_states(self) -> Any | None:
-        """Get all states from target Home Assistant."""
+        """Get state for all entities"""
         try:
             async with async_timeout.timeout(10):
                 protocol = "https" if self._ssl else "http"
@@ -113,3 +113,47 @@ class HaiApiClient:
             raise HaiApiClientError(
                 "Something really wrong happened!"
             ) from exception
+
+class HaiWebsocketApiClient:
+    """Connect to Home Assistant through Websocket API."""
+
+    def __init__(
+        self,
+        url: str,
+        auth_token: str,
+        ssl:bool,
+        session: aiohttp.ClientSession,
+    ) -> None:
+        """Initialize the API client."""
+        self._url = url
+        self._auth_token = auth_token
+        self._session = session
+        self._ssl = ssl
+
+    async def async_connect(self):
+        """Establish WS connection"""
+        try:
+            async with async_timeout.timeout(10):
+                protocol = "wss" if self._ssl else "ws"
+                self._connection = await self._session.ws_connect(
+                    f"{protocol}://{self._url}/api/websocket"
+                )
+        except asyncio.TimeoutError as exception:
+            raise HaiApiClientCommunicationError(
+                "Timeout error fetching information",
+            ) from exception
+        except (aiohttp.ClientError, socket.gaierror) as exception:
+            raise HaiApiClientCommunicationError(
+                "Error fetching information",
+            ) from exception
+        except Exception as exception:  # pylint: disable=broad-except
+            raise HaiApiClientError(
+                "Something really wrong happened!"
+            ) from exception
+
+    def disconnect(self):
+        pass # TODO
+
+    async def async_get_all_states(self) -> Any | None:
+        """Get state for all entities"""
+        pass # TODO
