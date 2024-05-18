@@ -18,4 +18,4 @@ Websocket connections are not supported yet and the sensor date is polled instea
 
 ## Thanks
 
-Based on [integration_blueprint]: https://github.com/ludeeus/integration_blueprint by Ludeeus
+Based on [integration_blueprint](https://github.com/ludeeus/integration_blueprint) by Ludeeus
