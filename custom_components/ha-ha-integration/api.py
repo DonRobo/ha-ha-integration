@@ -1,5 +1,4 @@
-"""Simple API client for Home Assistant.
-"""
+"""Simple API client for Home Assistant."""
 from __future__ import annotations
 
 import asyncio
@@ -78,7 +77,7 @@ class HaiRestApiClient:
             ) from exception
 
     async def async_get_all_states(self) -> Any | None:
-        """Get state for all entities"""
+        """Get state for all entities."""
         try:
             async with async_timeout.timeout(10):
                 protocol = "https" if self._ssl else "http"
