@@ -1,9 +1,9 @@
 """Sensor platform for ha-ha-integration."""
 from __future__ import annotations
 
-from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
+from homeassistant.components.sensor import SensorEntity
 
-from .const import DOMAIN, LOGGER
+from .const import DOMAIN
 from .coordinator import HaiDataUpdateCoordinator
 from .entity import HaiEntity
 from typing import Any

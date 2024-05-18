@@ -1,3 +1,5 @@
+"""Simple API client for Home Assistant.
+"""
 from __future__ import annotations
 
 import asyncio
@@ -7,9 +9,6 @@ from typing import Any
 import aiohttp
 import async_timeout
 
-from homeassistant.core import State
-
-from .const import LOGGER
 
 class HaiApiClientError(Exception):
     """Exception to indicate a general API error."""

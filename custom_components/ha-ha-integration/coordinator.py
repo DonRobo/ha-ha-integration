@@ -16,7 +16,7 @@ from .api import (
     HaiApiClientAuthenticationError,
     HaiApiClientError,
 )
-from .const import DOMAIN, LOGGER
+from .const import LOGGER
 
 
 # https://developers.home-assistant.io/docs/integration_fetching_data#coordinated-single-api-poll-for-data-for-all-entities
