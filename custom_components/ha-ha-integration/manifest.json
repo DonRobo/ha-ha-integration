@@ -4,5 +4,5 @@
   "iot_class": "cloud_polling",
   "version": "0.0.1",
   "integration_type": "device",
-  "name": "Another Home Assistant"
+  "name": "Home Assistant Integration"
 }
